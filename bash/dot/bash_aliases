@@ -1,0 +1,23 @@
+alias ..="cd .."
+alias ...="cd ../.."
+
+alias h='cd ~'
+alias c='clear'
+
+alias myip="curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//'"
+
+alias aptup='sudo apt-get update; sudo-apt-get upgrade'
+alias art='php artisan'
+
+alias ll='ls -lah'
+alias l='ls -lh'
+
+alias gd='git diff'
+alias gdc='git diff --cached'
+alias gdcw='git diff -u -b -w --cached'
+alias gdw='git diff -u -b -w'
+alias gdwc='git diff -u -b -w --cached'
+alias gl='git lg'
+alias gs='git status'
+alias tail='grc tail'
+alias tailf='grc tailf'

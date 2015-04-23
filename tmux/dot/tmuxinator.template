@@ -1,0 +1,38 @@
+
+name: __NAME__
+root: __ROOT__
+
+# Optional tmux socket
+# socket_name: foo
+
+# Runs before everything. Use it to start daemons etc.
+pre: cd Homestead; vagrant up; cd ..; chrome-__NAME__
+
+# Runs in each window and pane before window/pane specific commands. Useful for setting up interpreter versions.
+# pre_window: rbenv shell 2.0.0-p247
+
+# Pass command line options to tmux. Useful for specifying a different tmux.conf.
+# tmux_options: -f ~/.tmux.mac.conf
+
+# Change the command to call tmux.  This can be used by derivatives/wrappers like byobu.
+# tmux_command: byobu
+
+windows:
+    - editor:
+        layout: dcbe,239x60,0,0[239x54,0,0,0,239x5,0,55,2]
+        panes:
+            - vim:
+                - cd www
+                - vim
+            - pwd:
+                - cd www
+                - pwd
+    - homestead:
+        layout: main-vertical
+        panes:
+            - vagrant:
+                - cd Homestead
+                - vagrant ssh
+            - logs:
+                - cd www
+                - tail -f app/storage/logs/laravel.log

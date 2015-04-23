@@ -1,0 +1,6 @@
+if filereadable(expand("~/.vimrc.common"))
+  source ~/.vimrc.common
+endif
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
+endif

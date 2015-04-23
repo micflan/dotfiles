@@ -1,0 +1,173 @@
+#!/bin/bash
+
+NAME=$1
+ADDRESS=$2
+PORT=$3
+ROOT=$PWD/$NAME
+
+if [ -z "$NAME" ]
+then
+    echo "You must specify a name."
+    echo "usage: laraStart name address port"
+    echo
+    exit 0
+fi
+
+if [ -z "$ADDRESS" ]
+then
+    echo "You did not specify an IP address"
+    ADDRESS=192.168.$(( ( RANDOM % 10 )  + 11 )).$(( ( RANDOM % 10 )  + 11 ))
+    echo "Address randomly set to: $ADDRESS"
+    echo
+fi
+
+if [ -z "$PORT" ]
+then
+    echo "You did not specify a port"
+    PORT=$RANDOM
+    echo "Address randomly set to: $PORT"
+    echo
+fi
+
+# Confirm settings
+echo
+echo "Project Root:   $ROOT"
+echo "Project Name:   $NAME"
+echo "Homestead IP:   $ADDRESS"
+echo "Homestead Port: $PORT"
+echo
+read -p "Continue with these settings? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Nn]$ ]]
+then
+    echo
+    echo "OK. Nothing was installed."
+else
+
+    SED_NAME=${NAME//\//\\\/}
+    SED_ADDRESS=${ADDRESS//\//\\\/}
+    SED_PORT=${PORT//\//\\\/}
+    SED_ROOT=${ROOT//\//\\\/}
+    SED_HOME=${HOME//\//\\\/}
+
+    LINEMAN=false
+    LARAVEL=false
+
+    # Create directory
+    if [ ! -d $ROOT ];
+    then
+        mkdir -v $ROOT
+    fi
+
+    # Grab lineman
+    read -p "Install Lineman? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        LINEMANLARAVEL=true
+        echo -e "\e[36mGrabing Lineman... \e[2;49m"
+        cd $root
+        lineman new lineman
+        echo -e "\e[92mDone.\n"
+    fi
+
+    # Grab laravel
+    read -p "Install Laravel? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        LARAVEL=true
+        echo -e "\e[36mGrabing Laravel... \e[2;49m"
+        composer create-project laravel/laravel $ROOT/laravel --prefer-dist
+        echo -e "\e[92mDone.\n"
+    fi
+
+    # Grab homestead
+    read -p "Install Homestead VM? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo -e "\e[36mGrabing Homestead... \e[2;49m"
+        git clone https://github.com/micflan/homestead.git $ROOT/Homestead
+        rm -rf $ROOT/Homestead/.git
+        echo -e "\e[92mDone.\n"
+
+        # Setup homestead
+        echo -e "\e[36mSetting up Homestead... \e[2;49m"
+        sed -i.bak "s/__NAME__/$SED_NAME/g" $ROOT/Homestead/Homestead.yaml
+        rm $ROOT/Homestead/Homestead.yaml.bak
+        sed -i.bak "s/__ADDRESS__/$SED_ADDRESS/g" $ROOT/Homestead/Homestead.yaml
+        rm $ROOT/Homestead/Homestead.yaml.bak
+        sed -i.bak "s/__ROOT__/$SED_ROOT/g" $ROOT/Homestead/Homestead.yaml
+        rm $ROOT/Homestead/Homestead.yaml.bak
+        sed -i.bak "s/__HOMEDIR__/$SED_HOME/g" $ROOT/Homestead/Homestead.yaml
+        rm $ROOT/Homestead/Homestead.yaml.bak
+
+        sed -i.bak "s/__PORT__/$SED_PORT/g" $ROOT/Homestead/scripts/homestead.rb
+        rm $ROOT/Homestead/scripts/homestead.rb.bak
+        sed -i.bak "s/__NAME__/$SED_NAME/g" $ROOT/Homestead/scripts/homestead.rb
+        rm $ROOT/Homestead/scripts/homestead.rb.bak
+        echo -e "\e[92mDone.\n"
+    fi
+
+    # Setup Chrome environment
+    read -p "Install Chrome Environment? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo -e "\e[36mSetting up Chrome environment... \e[2;49m"
+        mkdir -v $ROOT/chrome-env
+        echo "alias chrome-$SED_NAME='google-chrome --user-data-dir=$ROOT/chrome-env &'" >> $HOME/.bash_local
+        echo -e "\e[92mDone.\n"
+    fi
+
+    # Setup tmuxinator
+    read -p "Setup Tmuxinator Project? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo -e "\e[36mSetting up Tmuxinator... \e[2;49m"
+        cp ~/dot/tmux/tmuxinator.template $ROOT/tmuxinator.yml
+        sed -i.bak "s/__NAME__/$SED_NAME/g" $ROOT/tmuxinator.yml
+        rm $ROOT/tmuxinator.yml.bak
+        sed -i.bak "s/__ADDRESS__/$SED_ADDRESS/g" $ROOT/tmuxinator.yml
+        rm $ROOT/tmuxinator.yml.bak
+        sed -i.bak "s/__ROOT__/$SED_ROOT/g" $ROOT/tmuxinator.yml
+        rm $ROOT/tmuxinator.yml.bak
+        ln -s $ROOT/tmuxinator.yml ~/.tmuxinator/$NAME.yml
+        echo -e "\e[92mDone.\n"
+    fi
+
+    # Git Init
+    read -p "Initilize Git? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo -e "\e[36mInitilizing Git in project root... \e[2;49m"
+        cd $ROOT
+        git init
+        git add .
+        git commit -a -v -m 'project start'
+        echo -e "\e[92mDone.\n"
+    fi
+
+    # All done!
+    echo -e "\n\e[0mProject Created!\n"
+    echo -e "\e[0mName:    $NAME"
+    echo -e "\e[0mAddress: $ADDRESS"
+    echo -e "\e[0mPorts:   $PORT, 33$PORT, 54$PORT\n"
+
+    touch $ROOT/Homestead/ServerInfo.txt
+    echo "Name:    $NAME" >> $ROOT/Homestead/ServerInfo.txt
+    echo "Address: $ADDRESS" >> $ROOT/Homestead/ServerInfo.txt
+    echo "Ports:   $PORT, 33$PORT, 54$PORT" >> $ROOT/Homestead/ServerInfo.txt
+
+    # Launch
+    read -p "Launch project with Tmuxinator now? " -n 1 -r
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        mux $NAME
+    fi
+
+fi
+
