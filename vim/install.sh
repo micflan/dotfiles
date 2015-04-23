@@ -4,7 +4,7 @@
 FILES="vimrc.bundles vimrc.bundles.local vimrc.common vimrc"
 
 # Source directory
-SOURCE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/dot"
+SOURCE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Optionally include the .vim folder
 echo -e "\033[32m"

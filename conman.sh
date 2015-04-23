@@ -89,9 +89,9 @@ function conman_copy {
     # copy it to users config directory
     for fn in $FILES
     do
-        if [ -e $SOURCE/$fn ]
+        if [ -e $SOURCE/dot/$fn ]
         then
-            cp -rv $SOURCE/$fn $DESTINATION/.$fn
+            cp -rv $SOURCE/dot/$fn $DESTINATION/.$fn
         fi
     done
 

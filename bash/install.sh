@@ -4,7 +4,7 @@
 FILES="bash_profile bash_aliases bash_logout bashrc inputrc bash_common"
 
 # Source directory
-SOURCE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/dot"
+SOURCE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Run the configuration manager
 conman_copy "$FILES" "$SOURCE"
@@ -19,7 +19,7 @@ echo -e "\033[0m"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
     mkdir -v ~/.bin
-    cp -iv $SOURCE/bin/* ~/.bin/
+    cp -iv $SOURCE/dot/bin/* ~/.bin/
 fi
 
 #
