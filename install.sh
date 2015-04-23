@@ -27,5 +27,5 @@ read -p "Install Vim Config? " -n 1 -r
 echo -e "\033[0m"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    . $DIR/vim-conf/install.sh
+    . $DIR/vim/install.sh
 fi
