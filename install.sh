@@ -29,3 +29,5 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
     . $DIR/vim/install.sh
 fi
+
+source ~/.bashrc

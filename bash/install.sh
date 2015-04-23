@@ -26,6 +26,5 @@ fi
 # All done!
 #
 
-source ~/.bashrc
 echo -e "\033[32mEnjoy Bash!\033[0m\n"
 
